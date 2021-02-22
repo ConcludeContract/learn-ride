@@ -1,0 +1,222 @@
+##################################################
+# This gives an introduction to RIDE in 15 minutes
+#
+# Popular blockchain using RIDE
+# Waves https://ide.wavesplatform.com
+#
+# RIDE
+# - statically-typed
+# - lazy
+# - functional
+# - expression-based
+# - not turing complete
+# 
+# This is a comment line
+# And there is no multiline comments
+##################################################
+
+############
+# Directives
+############
+
+{-# STDLIB_VERSION 3 #-} # You can write comments like here
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+# 2 content types: expression or dapp
+# 2 script types: account or asset
+# dApp content type is not allowed for an asset
+
+###########
+# Variables
+###########
+
+let x = "Alice"
+let y = 4
+
+# Declared with let only
+# All variables are immutable
+# Type inferred from right value side
+# Global or function scope
+# Unused variables not calculated
+
+####
+# IF
+####
+
+if (2 &gt; 1) then "true"
+else "false"
+
+# Can be used as an expression
+# ELSE branch always required
+
+###########
+# Functions
+###########
+
+func greet(name: String) = {
+  "Hello, " + name
+}
+
+func add(a: Int, b: Int) = {
+  func m(a: Int) = a
+  m(a) + b
+}
+
+func calc() = {
+  42
+}
+
+# Declared with func
+# Are not callable from outside
+# Used only after their declaration
+# Only in CONTENT_TYPE DAPP
+# Without annotation
+# Return type automatically inferred
+# Last statement is the result
+# Type come after argument’s name
+
+#############
+# Basic types
+#############
+
+Boolean # true
+
+String # "Hey"
+# Operators needs same type values
+# Only double quotes
+
+Int # 1610
+
+ByteVector # base58'...', base64'...', base16'...', fromBase58String("...") etc.
+
+###############
+# Special types
+###############
+
+List # [16, 10, "hello"]
+# Known size only
+# cons(1997, initList) to prepend element
+# No way to concatenate two lists
+# No way to prepend multiple values
+
+Nothing #
+
+Unit # unit
+# No null type in RIDE
+# Built-in functions return Unit type instead of null
+
+############
+# Union Type
+############
+
+Union(String | Unit)
+
+# Can use pattern matching
+# Return UNIT if key-value pairs don’t exist
+# Script will terminate in case of Unit
+# Use getString + extract or getStringValue
+
+############
+# Exceptions
+############
+
+throw("Here is exception text")
+
+# Terminate execution immediately
+# No ways to catch thrown exceptions
+# Send feedback to the user
+# Used for debug (no debugger in RIDE)
+
+##################
+# Pattern Matching
+##################
+
+let key = match getInteger(this, "key") {
+    case key: Int =&gt; key
+    case _ =&gt; 0
+}
+
+# Only for predefined types
+# "_" represent every other cases
+
+#############
+# Annotations
+#############
+
+@Callable(i)
+func pay() = {
+  let amount = getPayment(i)
+  WriteSet([DataEntry(i.caller.bytes, amount)])
+}
+
+# Always declared after USER function
+# @Callable called from outside with InvokeScriptTransaction
+# "i" is bonded to the function with invocation infos:
+# callers'publickey, address, payment attached to the transaction, fee, transactionId, etc
+
+# Execution Results:
+# - Write own state
+# - Transfer own tokens
+# - @Callable return either ScriptResult, WriteSet or TransferSet
+# - WriteSet can contain up to 100 DataEntry
+# - TransferSet can contain up to 10 ScriptTransfer
+
+@Verifier(tx)
+func verifier() = {
+  match tx {
+    case m: TransferTransaction =&gt; tx.amount &lt;= 100 # can send up to 100 tokens
+    case _ =&gt; false
+  }
+}
+
+# Always declared after USER function
+# Only 1 Verifier per script
+# Can't be called from the outside
+# @Verifier always returns Boolean
+# "tx" is an object with all fields of the current outgoing transaction
+# No @Verifier = account/dApp key verification by default
+# @Verifier to an account/dApp open transactions to anyone by default
+# Set SigVerify on cases you needs then case _ =&gt; false
+# tx.senderPublicKey is always key of the current account/dApp
+
+######################################################
+# Use SigVerify to secure account if using a @Verifier
+######################################################
+
+@Verifier(tx)
+func verify() = {
+    match tx {
+        case t: TransferTransaction =&gt; sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+        case s: SetScriptTransaction =&gt; sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+        case _ =&gt; false
+    }
+}
+
+###############
+# Reading State
+###############
+
+getInteger(this, “key”)
+getInteger(otherAccount, “key”)
+
+# func getInteger: Address, String =&gt; Int | Unit
+# func getString: Address, String =&gt; String | Unit
+# func getBoolean: Address, String =&gt; Boolean | Unit
+# func getByteVector: Address, String =&gt; ByteVector | Unit
+
+# Use extract() or value() to get the value, examples:
+# value(getString(this, "value"));      getString(this, "value").value()
+# extract(getString(this, "value"));    this.getInteger("key")
+
+######
+# FOLD
+######
+
+func sum(a: Int, b: Int) = a + b 
+let arr = [1, 2, 3, 4, 5]
+let sum = FOLD&lt;5&gt;(arr, 0, sum) # result:15
+
+# Everything happens in pre-compile time
+# You have to know the max size of your collection
+# If you get more elements than expected, you get Exception
