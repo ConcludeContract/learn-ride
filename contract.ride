@@ -213,7 +213,7 @@ getInteger(otherAccount, “key”)
 # FOLD
 ######
 
-func sum(a: Int, b: Int) = a + b 
+func sum(a: Int, b: Int) = a + b
 let arr = [1, 2, 3, 4, 5]
 let sum = FOLD<5>(arr, 0, sum) # result:15
 
