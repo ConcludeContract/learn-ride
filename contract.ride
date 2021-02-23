@@ -133,8 +133,8 @@ throw("Here is exception text")
 ##################
 
 let key = match getInteger(this, "key") {
-    case key: Int =&gt; key
-    case _ =&gt; 0
+    case key: Int => key
+    case _ => 0
 }
 
 # Only for predefined types
