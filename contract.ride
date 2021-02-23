@@ -44,7 +44,7 @@ let y = 4
 # IF
 ####
 
-if (2 &gt; 1) then "true"
+if (2 > 1) then "true"
 else "false"
 
 # Can be used as an expression
@@ -165,8 +165,8 @@ func pay() = {
 @Verifier(tx)
 func verifier() = {
   match tx {
-    case m: TransferTransaction =&gt; tx.amount &lt;= 100 # can send up to 100 tokens
-    case _ =&gt; false
+    case m: TransferTransaction => tx.amount <= 100 # can send up to 100 tokens
+    case _ => false
   }
 }
 
@@ -177,7 +177,7 @@ func verifier() = {
 # "tx" is an object with all fields of the current outgoing transaction
 # No @Verifier = account/dApp key verification by default
 # @Verifier to an account/dApp open transactions to anyone by default
-# Set SigVerify on cases you needs then case _ =&gt; false
+# Set SigVerify on cases you needs then case _ => false
 # tx.senderPublicKey is always key of the current account/dApp
 
 ######################################################
@@ -187,9 +187,9 @@ func verifier() = {
 @Verifier(tx)
 func verify() = {
     match tx {
-        case t: TransferTransaction =&gt; sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
-        case s: SetScriptTransaction =&gt; sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
-        case _ =&gt; false
+        case t: TransferTransaction => sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+        case s: SetScriptTransaction => sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+        case _ => false
     }
 }
 
@@ -200,10 +200,10 @@ func verify() = {
 getInteger(this, “key”)
 getInteger(otherAccount, “key”)
 
-# func getInteger: Address, String =&gt; Int | Unit
-# func getString: Address, String =&gt; String | Unit
-# func getBoolean: Address, String =&gt; Boolean | Unit
-# func getByteVector: Address, String =&gt; ByteVector | Unit
+# func getInteger: Address, String => Int | Unit
+# func getString: Address, String => String | Unit
+# func getBoolean: Address, String => Boolean | Unit
+# func getByteVector: Address, String => ByteVector | Unit
 
 # Use extract() or value() to get the value, examples:
 # value(getString(this, "value"));      getString(this, "value").value()
@@ -215,7 +215,7 @@ getInteger(otherAccount, “key”)
 
 func sum(a: Int, b: Int) = a + b 
 let arr = [1, 2, 3, 4, 5]
-let sum = FOLD&lt;5&gt;(arr, 0, sum) # result:15
+let sum = FOLD<5>(arr, 0, sum) # result:15
 
 # Everything happens in pre-compile time
 # You have to know the max size of your collection
