@@ -55,16 +55,16 @@ else "false"
 ###########
 
 func greet(name: String) = {
-  "Hello, " + name
+    "Hello, " + name
 }
 
 func add(a: Int, b: Int) = {
-  func m(a: Int) = a
-  m(a) + b
+    func m(a: Int) = a
+    m(a) + b
 }
 
 func calc() = {
-  42
+    42
 }
 
 # Declared with func
@@ -146,8 +146,8 @@ let key = match getInteger(this, "key") {
 
 @Callable(i)
 func pay() = {
-  let amount = getPayment(i)
-  WriteSet([DataEntry(i.caller.bytes, amount)])
+    let amount = getPayment(i)
+    WriteSet([DataEntry(i.caller.bytes, amount)])
 }
 
 # Always declared after USER function
@@ -164,10 +164,10 @@ func pay() = {
 
 @Verifier(tx)
 func verifier() = {
-  match tx {
-    case m: TransferTransaction => tx.amount <= 100 # can send up to 100 tokens
-    case _ => false
-  }
+    match tx {
+        case m: TransferTransaction => tx.amount <= 100 # can send up to 100 tokens
+        case _ => false
+    }
 }
 
 # Always declared after USER function
